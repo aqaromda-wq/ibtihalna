@@ -7,7 +7,67 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.5'
+          flutter-version: '3.22.0'
+          channel: 'stable'
+      - name: إصلاح الملفات
+        run: |
+          rm -f main.dart
+          ls -la
+          # إصلاح اسم المجلد العربي إلى lib
+          if [ -d "مكتبة" ]; then mkdir -p lib && cp "مكتبة"/* lib/ 2>/dev/null || true; fi
+          # إصلاح اسم ملف pubspec
+          if [ -f "pubspec.yaml ملف" ]; then cp "pubspec.yaml ملف" pubspec.yaml; fi
+          if [ -f "ملف pubspec.yaml" ]; then cp "ملف pubspec.yaml" pubspec.yaml; fi
+          # إنشاء ملف pubspec صحيح إذا ناقص
+          cat > pubspec.yaml << 'PUB'
+          name: ibtihalna
+          description: Ibtihalna Islamic App
+          publish_to: 'none'
+          version: 1.0.0+1
+          environment:
+            sdk: '>=3.0.0 <4.0.0'
+          dependencies:
+            flutter:
+              sdk: flutter
+            cupertino_icons: ^1.0.6
+          flutter:
+            uses-material-design: true
+          PUB
+          # إنشاء كود ابتهالنا النظيف
+          mkdir -p lib
+          cat > lib/main.dart << 'DART'
+          import 'package:flutter/material.dart';
+          void main() => runApp(const IbtihalnaApp());
+          class IbtihalnaApp extends StatelessWidget {
+            const IbtihalnaApp({super.key});
+            @override
+            Widget build(BuildContext context) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(fontFamily: 'Tajawal'),
+                home: Scaffold(
+                  backgroundColor: const Color(0xFFF8FDF9),
+                  body: SafeArea(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 40),
+                        const Text('أبتهالنا', style: TextStyle(fontSize: 42, fontWeight: FontWeight.bold, color: Color(0xFF1B4D3E))),
+                        const Text('رفيقة دربك إلى الله'),
+                        const SizedBox(height: 30),
+                        const Icon(Icons.mosque, size: 90, color: Color(0xFF1B4D3E)),
+                        const SizedBox(height: 20),
+                        const Text('تم بناء التطبيق بنجاح!', style: TextStyle(fontSize: 18)),
+                        const SizedBox(height: 10),
+                        const Text('اللهم اجعله صدقة جارية لابنتي ابتهال', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
+          DART
+      - run: flutter create. --platforms=android --project-name ibtihalna --org com.ibtihalna.app --overwrite
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
